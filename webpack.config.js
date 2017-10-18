@@ -1,5 +1,5 @@
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+let webpack = require('webpack');
+let HtmlWebpackPlugin = require('html-webpack-plugin');
 
 /*
  * We've enabled UglifyJSPlugin for you! This minifies your app
@@ -8,8 +8,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
  * https://github.com/webpack-contrib/uglifyjs-webpack-plugin
  *
  */
-var path = require('path');
-var ROOT_PATH = process.cwd();
+let path = require('path');
+let ROOT_PATH = process.cwd();
 
 module.exports = {
   entry: './src/index.js',
@@ -19,11 +19,13 @@ module.exports = {
     path: path.join(ROOT_PATH, 'dist')
   },
 
+  devtool: 'cheap-module-inline-source-map',
+
   devServer: {
     historyApiFallback: true,
     hot: true,
     inline: true,
-    host: '0.0.0.0',
+    host: '0.0.0.0'
   },
 
   module: {
@@ -31,16 +33,34 @@ module.exports = {
       {
         test: /\.js$/,
         use: ['babel-loader'],
-        exclude: /node_modules/,
+        exclude: /node_modules/
       },
-    ],
+      {
+        test: /\.css$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          {
+            loader: 'postcss-loader',
+            options: {
+              config: { path: path.join(__dirname, 'postcss.config.js') }
+            }
+          }
+        ]
+      }
+    ]
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"development"'
+    }),
+
     new HtmlWebpackPlugin({
       title: 'flv',
       template: 'examples/index.html',
       inject: 'body'
-    }),
+    })
   ]
 };
